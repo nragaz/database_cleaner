@@ -7,7 +7,7 @@ module DatabaseCleaner::ActiveRecord
       if connection.respond_to?(:increment_open_transactions)
         connection.increment_open_transactions
       else
-        connection.class.__send__(:increment_open_transactions)
+        connection_class.__send__(:increment_open_transactions)
       end
       connection.begin_db_transaction
     end
@@ -21,7 +21,7 @@ module DatabaseCleaner::ActiveRecord
       if connection.respond_to?(:decrement_open_transactions)
         connection.decrement_open_transactions
       else
-        connection.class.__send__(:decrement_open_transactions)
+        connection_class.__send__(:decrement_open_transactions)
       end
     end
   end

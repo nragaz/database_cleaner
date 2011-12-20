@@ -18,32 +18,15 @@ module DatabaseCleaner
       end
 
       def db
-        @model_class || super
+        @model_class || ::ActiveRecord::Base
       end
 
       def connection
         connection_class.connection
       end
 
-      def create_connection_klass
-        Class.new(::ActiveRecord::Base)
-      end
-
-      def connection_klass
-        return ::ActiveRecord::Base unless connection_hash
-        klass = create_connection_klass
-        klass.send :establish_connection, connection_hash
-        klass
-      end
-
-      private
-
       def connection_class
-        @connection_class ||=  if @model_class
-                                 @model_class.is_a?(String) ? Module.const_get(@model_class) : @model_class
-                               else
-                                 ::ActiveRecord::Base
-                               end
+        @connection_class ||=  db.is_a?(String) ? Module.const_get(db) : db
       end
     end
   end
