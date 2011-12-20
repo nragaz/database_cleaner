@@ -29,7 +29,7 @@ module ActiveRecord
       end
     end
 
-    MYSQL_ADAPTER_PARENT = USE_ARJDBC_WORKAROUND ? JdbcAdapter : AbstractAdapter
+    MYSQL_ADAPTER_PARENT = USE_ARJDBC_WORKAROUND ? JdbcAdapter : (defined?(AbstractMysqlAdapter) ? AbstractMysqlAdapter : AbstractAdapter)
     SQLITE_ADAPTER_PARENT = USE_ARJDBC_WORKAROUND ? JdbcAdapter : SQLiteAdapter
     POSTGRE_ADAPTER_PARENT = USE_ARJDBC_WORKAROUND ? JdbcAdapter : AbstractAdapter
 
@@ -39,7 +39,7 @@ module ActiveRecord
       end
     end
 
-    class Mysql2Adapter < AbstractAdapter
+    class Mysql2Adapter < MYSQL_ADAPTER_PARENT
       def truncate_table(table_name)
         execute("TRUNCATE TABLE #{quote_table_name(table_name)};")
       end
