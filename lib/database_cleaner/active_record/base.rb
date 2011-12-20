@@ -9,33 +9,20 @@ module DatabaseCleaner
       %w[truncation transaction deletion]
     end
 
-    def self.config_file_location=(path)
-      @config_file_location = path
-    end
-
-    def self.config_file_location
-      @config_file_location ||= "#{DatabaseCleaner.app_root}/config/database.yml"
-    end
-
     module Base
       include ::DatabaseCleaner::Generic::Base
 
-      attr_accessor :connection_hash
-
-      def db=(desired_db)
-        @db = desired_db
-        load_config
+      def db=(model_class)
+        @model_class = model_class
+        @connection_class = nil
       end
 
       def db
-        @db || super
+        @model_class || super
       end
 
-      def load_config
-        if self.db != :default && File.file?(ActiveRecord.config_file_location)
-          connection_details   = YAML::load(ERB.new(IO.read(ActiveRecord.config_file_location)).result)
-          @connection_hash = connection_details[self.db.to_s]
-        end
+      def connection
+        connection_class.connection
       end
 
       def create_connection_klass
@@ -47,6 +34,16 @@ module DatabaseCleaner
         klass = create_connection_klass
         klass.send :establish_connection, connection_hash
         klass
+      end
+
+      private
+
+      def connection_class
+        @connection_class ||=  if @model_class
+                                 @model_class.is_a?(String) ? Module.const_get(@model_class) : @model_class
+                               else
+                                 ::ActiveRecord::Base
+                               end
       end
     end
   end
