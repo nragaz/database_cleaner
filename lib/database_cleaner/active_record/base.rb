@@ -13,7 +13,7 @@ module DatabaseCleaner
       include ::DatabaseCleaner::Generic::Base
 
       def db=(model_class)
-        @model_class = model_class
+        @model_class = model_class unless model_class == :default # hack. this design sucks.
         @connection_class = nil
       end
 
